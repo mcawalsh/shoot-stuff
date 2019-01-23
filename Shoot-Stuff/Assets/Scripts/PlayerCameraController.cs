@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +17,25 @@ public class PlayerCameraController : MonoBehaviour
     void Start()
     {
         player = transform.parent.gameObject;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
     {
         RotateCamera();
+        CheckForShooting();
+    }
+
+    private void CheckForShooting()
+    {
+        if (Input.GetMouseButtonDown(0)) {
+            
+            RaycastHit whatIhit;
+            if (Physics.Raycast(transform.position, transform.forward, out whatIhit, Mathf.Infinity)) {
+                Debug.Log(whatIhit.collider.name);
+            }
+        }
     }
 
     private void RotateCamera()
