@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class GunController : MonoBehaviour
 	public float impactForce = 40f;
 	public bool fullAuto = true;
 	public float fireRate = 15;
+	public TextMeshProUGUI textMeshPro;
 
 	private float nextTimeToFire = 0f;
 
@@ -21,6 +23,7 @@ public class GunController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.E))
 		{
 			fullAuto = !fullAuto;
+			textMeshPro.text = fullAuto ? "Auto" : "Single";
 		}
 
 		bool shouldFire = Input.GetButtonDown(FIRE_BUTTON) || (fullAuto && Input.GetButton(FIRE_BUTTON));
