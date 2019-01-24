@@ -281,8 +281,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   range: 100
+  impactForce: 40
   fpsCam: {fileID: 534669904}
   muzzleFlash: {fileID: 1634020884}
+  impactEffect: {fileID: 100014, guid: 5332791ebce075d4a9e56f4581e7fb47, type: 3}
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,7 +447,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &985251402
 GameObject:
@@ -986,7 +988,7 @@ PrefabInstance:
     - target: {fileID: 1292048197519165404, guid: 556c5bf4bb855e445bb6bd2b5e5b3fe9,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1292048197519165404, guid: 556c5bf4bb855e445bb6bd2b5e5b3fe9,
         type: 3}
