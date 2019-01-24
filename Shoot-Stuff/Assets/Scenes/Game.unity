@@ -281,7 +281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   range: 100
-  impactForce: 40
+  impactForce: 100
   fpsCam: {fileID: 534669904}
   muzzleFlash: {fileID: 1634020884}
   impactEffect: {fileID: 100014, guid: 5332791ebce075d4a9e56f4581e7fb47, type: 3}
@@ -1005,6 +1005,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1292048197519165407, guid: 556c5bf4bb855e445bb6bd2b5e5b3fe9,
+        type: 3}
+      propertyPath: destroyedEffect
+      value: 
+      objectReference: {fileID: 100010, guid: e0609132424a24844b1d53ad3d704fd9, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 556c5bf4bb855e445bb6bd2b5e5b3fe9, type: 3}
 --- !u!1001 &4370849721848545108

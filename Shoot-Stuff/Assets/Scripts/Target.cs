@@ -3,6 +3,7 @@
 public class Target : MonoBehaviour, IDamageable
 {
 	public float health = 50f;
+	public GameObject destroyedEffect;
 
 	void Start()
     {
@@ -24,7 +25,13 @@ public class Target : MonoBehaviour, IDamageable
 	{
 		if (health <= 0)
 		{
+			var pos = transform.position;
+			var direction = transform.up;
+
 			Destroy(gameObject);
+
+			GameObject displayedDestroyEffect = Instantiate(destroyedEffect, pos, Quaternion.LookRotation(direction));
+			Destroy(displayedDestroyEffect, 2f);
 		}
 	}
 }
