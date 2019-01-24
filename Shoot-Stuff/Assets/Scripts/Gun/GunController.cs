@@ -2,9 +2,15 @@
 
 public class GunController : MonoBehaviour
 {
+	private const string FIRE_BUTTON = "Fire1";
+
 	public float damage = 10f;
 	public float range = 100f;
 	public float impactForce = 40f;
+	public bool fullAuto = true;
+	public float fireRate = 15;
+
+	private float nextTimeToFire = 0f;
 
 	public Camera fpsCam;
 	public ParticleSystem muzzleFlash;
@@ -12,8 +18,17 @@ public class GunController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+		if (Input.GetKeyDown(KeyCode.E))
 		{
+			fullAuto = !fullAuto;
+		}
+
+		bool shouldFire = Input.GetButtonDown(FIRE_BUTTON) || (fullAuto && Input.GetButton(FIRE_BUTTON));
+
+		if (shouldFire && Time.time >= nextTimeToFire)
+		{
+			nextTimeToFire = Time.time + 1f / fireRate;
+
 			Shoot();
 		}
     }
