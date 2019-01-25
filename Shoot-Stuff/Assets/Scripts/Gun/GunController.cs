@@ -18,12 +18,17 @@ public class GunController : MonoBehaviour
 	public ParticleSystem muzzleFlash;
 	public GameObject impactEffect;
 
+	void Start()
+	{
+		SetFireRateText();
+	}
+
     void Update()
     {
 		if (Input.GetKeyDown(KeyCode.E))
 		{
 			fullAuto = !fullAuto;
-			textMeshPro.text = fullAuto ? "Auto" : "Single";
+			SetFireRateText();
 		}
 
 		bool shouldFire = Input.GetButtonDown(FIRE_BUTTON) || (fullAuto && Input.GetButton(FIRE_BUTTON));
@@ -35,6 +40,11 @@ public class GunController : MonoBehaviour
 			Shoot();
 		}
     }
+
+	private void SetFireRateText()
+	{
+		textMeshPro.text = fullAuto ? "Auto" : "Single";
+	}
 
 	private void Shoot()
 	{
