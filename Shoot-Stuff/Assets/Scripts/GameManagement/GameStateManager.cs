@@ -31,8 +31,8 @@ public class GameStateManager : MonoBehaviour
 	{
 		if (Player != null)
 		{
-			Debug.Log($"Placing player at {spawn.Position}...");
-			Player.transform.position = new Vector3(spawn.Position.x, 1.5f, spawn.Position.z);
+			Debug.Log($"Placing player at {spawn.WorldPosition}...");
+			Player.transform.position = new Vector3(spawn.WorldPosition.x, 1.5f, spawn.WorldPosition.z);
 		}
 	}
 
@@ -41,13 +41,13 @@ public class GameStateManager : MonoBehaviour
 		foreach (KeyValuePair<Guid, Room> kvp in dungeon.Rooms)
 		{
 			Debug.Log($"Drawing room {kvp.Value.Id}...");
-			Instantiate(RoomGameObject, kvp.Value.Position, Quaternion.identity);
+			Instantiate(RoomGameObject, kvp.Value.WorldPosition, Quaternion.identity);
 		}
 
 		foreach (KeyValuePair<Guid, Corridor> kvp in dungeon.Corridors)
 		{
 			GameObject go = GetCorridorGameObject(kvp.Value.Type);
-			Instantiate(go, kvp.Value.Position, Quaternion.identity);
+			Instantiate(go, kvp.Value.WorldPosition, Quaternion.identity);
 		}
 	}
 
