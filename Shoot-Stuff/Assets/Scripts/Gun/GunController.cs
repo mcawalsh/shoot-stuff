@@ -57,6 +57,7 @@ public class GunController : MonoBehaviour
 			Debug.Log(hit.collider.name);
 
 			IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+			Debug.Log($"{hit.collider.name} at position: {hit.collider.transform.position}");
 
 			if (damageable != null)
 			{

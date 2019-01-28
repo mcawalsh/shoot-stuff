@@ -1,42 +1,63 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.GameManagement;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameStateManager : MonoBehaviour
 {
-	private MapGenerator mapGenerator;
-	private GameObject[] floors;
+	private DungeonGenerator generator;
 
-	[SerializeField]
-	public GameObject floorPrefab;
-	[SerializeField]
-	public int rooms = 2;
+	public GameObject RoomGameObject;
+	public GameObject TopLeft;
+	public GameObject Player;
+	public int GridWidth = 10;
+	public int GridHeight = 10;
+	public int GridRatio = 4;
 
-    void Start()
-    {
+	void Start()
+	{
 		Debug.Log("GameStateManager Starting...");
 
-		if (mapGenerator == null)
-			mapGenerator = new MapGenerator();
+		if (generator == null)
+			generator = new DungeonGenerator(GridRatio, GridWidth, GridHeight);
 
-		var positions = mapGenerator.GenerateMap(rooms);
+		Dungeon dungeon = generator.GenerateDungeon();
 
-		BuildMap(positions);
-		
-    }
+		DrawDungeon(dungeon);
+		PlacePlayer(dungeon.Spawn);
+	}
 
-	private void BuildMap(Vector3[] positions)
+	private void PlacePlayer(Room spawn)
 	{
-		floors = new GameObject[rooms];
-
-		for (int i = 0; i < positions.Length; i++)
+		if (Player != null)
 		{
-			var pos = positions[i];
-
-			var newFloor = Instantiate(floorPrefab, pos, Quaternion.identity);
-			floors[i] = newFloor;
+			Debug.Log($"Placing player at {spawn.Position}...");
+			Player.transform.position = new Vector3(spawn.Position.x, 1.5f, spawn.Position.z);
 		}
 	}
 
-    
+	private void DrawDungeon(Dungeon dungeon)
+	{
+		foreach (KeyValuePair<Guid, Room> kvp in dungeon.Rooms)
+		{
+			Debug.Log($"Drawing room {kvp.Value.Id}...");
+			Instantiate(RoomGameObject, kvp.Value.Position, Quaternion.identity);
+		}
+
+		foreach (KeyValuePair<Guid, Corridor> kvp in dungeon.Corridors)
+		{
+			GameObject go = GetCorridorGameObject(kvp.Value.Type);
+			Instantiate(go, kvp.Value.Position, Quaternion.identity);
+		}
+	}
+
+	private GameObject GetCorridorGameObject(CorridorType type)
+	{
+		switch (type)
+		{
+			default:
+				return TopLeft;
+		}
+	}
+
 }
