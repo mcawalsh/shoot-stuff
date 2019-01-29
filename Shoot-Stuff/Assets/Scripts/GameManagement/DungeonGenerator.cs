@@ -39,14 +39,20 @@ public class DungeonGenerator
 
 		AddGridItemToArray(corridor);
 
-		GenerateRoom(RoomType.Standard, new List<GridPosition>() { corridor.GetExitGridPosition(Direction.South) }, 0);
+		GenerateRoom(RoomType.Standard, new List<GridPosition>() {
+			corridor.GetExitGridPosition(Direction.South),
+			corridor.GetExitGridPosition(Direction.East),
+			corridor.GetExitGridPosition(Direction.North),
+			corridor.GetExitGridPosition(Direction.West)
+		}, 0);
 
 		return dungeon;
 	}
 
 	private Room GenerateRoom(RoomType roomType, List<GridPosition> gridPositions, int branchDepth)
 	{
-		List<Door> roomDoors = GenerateDoors(roomType, gridPositions, new List<Direction>());
+		Debug.Log($"Generating new room...");
+		List<Door> roomDoors = GenerateDoors(roomType, gridPositions, new List<Direction>(), branchDepth);
 		Room newRoom = new Room(roomType, roomDoors, gridPositions);
 
 		this.dungeon.Rooms.Add(newRoom.Id, newRoom);
@@ -60,6 +66,7 @@ public class DungeonGenerator
 			}
 			else
 			{
+				Debug.Log($"Generating branches at depth {branchDepth}");
 				GenerateBranches(roomType, newRoom, branchDepth + 1);
 			}
 		}
@@ -89,13 +96,16 @@ public class DungeonGenerator
 	private bool GenerateBranchedCorridors(CorridorType corridorType, GridPosition newItemGridPosition, int branchDepth)
 	{
 		// Check if the grid position is valid, if it isn't then return false
-		if (this.roomsArray[newItemGridPosition.X, newItemGridPosition.Y] != null)
+		if (CheckNewGridPositionIsValid(newItemGridPosition))
 			return false; // This means something already exists there
 
+		Debug.Log("Generating a corridor...");
 		List<GridPosition> corridorGridPositions = new List<GridPosition>() { newItemGridPosition };
 		Corridor corridor = new Corridor(CorridorType.TopRight, corridorGridPositions);
 
-		if (!GenerateBranchedRooms(RoomType.Standard, corridor.GetExitGridPosition(Direction.South), branchDepth + 1)) {
+		if (!GenerateBranchedRooms(RoomType.Standard, corridor.GetExitGridPosition(Direction.South), branchDepth + 1))
+		{
+			Debug.Log($"Branched Room not valid... at {corridor.GetExitGridPosition(Direction.South)}");
 			return false;
 		}
 
@@ -105,24 +115,28 @@ public class DungeonGenerator
 		return true;
 	}
 
-	private bool GenerateBranchedRooms(RoomType roomType, GridPosition newItemGridPosition, int branchDepth) {
-
+	private bool GenerateBranchedRooms(RoomType roomType, GridPosition newItemGridPosition, int branchDepth)
+	{
 		// Check if the grid position is valid, if it isn't then return false
-		if (this.roomsArray[newItemGridPosition.X, newItemGridPosition.Y] != null)
+		if (CheckNewGridPositionIsValid(newItemGridPosition))
 			return false; // This means something already exists there
+
+		Debug.Log("Generating a new room...");
 
 		// Create the room
 		List<GridPosition> newGridPositions = new List<GridPosition>() { newItemGridPosition };
-		List<Door> roomDoors = GenerateDoors(roomType, newGridPositions, new List<Direction>());
+		List<Door> roomDoors = GenerateDoors(roomType, newGridPositions, new List<Direction>(), branchDepth);
 		Room newRoom = new Room(roomType, roomDoors, newGridPositions);
 
 		// If the branchDepth <= max depth generate branches
 		if (branchDepth >= this.maxBranchDepth)
 		{
+			Debug.Log($"Clearing doors at branch level {branchDepth}");
 			newRoom.ClearDoors();
 		}
 		else
 		{
+			Debug.Log("Generating branches.. ");
 			GenerateBranches(roomType, newRoom, branchDepth + 1);
 		}
 
@@ -130,6 +144,13 @@ public class DungeonGenerator
 		AddGridItemToArray(newRoom);
 
 		return true;
+	}
+
+	private bool CheckNewGridPositionIsValid(GridPosition gridPosition)
+	{
+		return ((gridPosition.X < -gridX) || (gridPosition.X > gridX) ||
+			(gridPosition.Y < -gridY) || (gridPosition.Y > gridY) ||
+			(this.roomsArray[gridPosition.X, gridPosition.Y] != null));
 	}
 
 	private Corridor GenerateCorridorBranch(Door door, int branchDepth)
@@ -151,7 +172,7 @@ public class DungeonGenerator
 		return corridor;
 	}
 
-	private List<Door> GenerateDoors(RoomType roomType, List<GridPosition> roomPositions, List<Direction> unavailableDoors)
+	private List<Door> GenerateDoors(RoomType roomType, List<GridPosition> roomPositions, List<Direction> unavailableDoors, int branchDepth)
 	{
 		if (roomType == RoomType.Spawn)
 			return new List<Door> { new Door(Direction.South, roomPositions.First()) };
@@ -162,7 +183,13 @@ public class DungeonGenerator
 
 		List<GridPosition> viableExits = GetViableExits(roomPositions).OrderBy(x => rnd.Next()).ToList();
 		List<Direction> doorOptions = directionOptions.Except(unavailableDoors).OrderBy(x => rnd.Next()).ToList();
-		int numOfDoors = URandom.Range(0, doorOptions.Count);
+
+		int numOfDoors = URandom.Range(1, doorOptions.Count);
+
+		if (branchDepth >= maxBranchDepth)
+			numOfDoors = URandom.Range(0, doorOptions.Count);
+
+		Debug.Log($"Generating {numOfDoors} doors...");
 
 		List<Door> doors = new List<Door>();
 

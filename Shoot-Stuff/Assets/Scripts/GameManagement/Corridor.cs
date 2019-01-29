@@ -19,9 +19,16 @@ public class Corridor : GridItem, IGridItem
 	{
 		GridPosition gridPosition = GridPositions.First();
 
-		if (gridPosition != null)
-			return new GridPosition(gridPosition.X, gridPosition.Y - 1);
-
-		return new GridPosition(0, 0);
+		switch(direction)
+		{
+			case Direction.North:
+				return new GridPosition(gridPosition.X, gridPosition.Y + 1);
+			case Direction.East:
+				return new GridPosition(gridPosition.X + 1, gridPosition.Y);
+			case Direction.West:
+				return new GridPosition(gridPosition.X - 1, gridPosition.Y);
+			default:
+				return new GridPosition(gridPosition.X, gridPosition.Y - 1);
+		}
 	}
 }
