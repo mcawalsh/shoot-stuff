@@ -1,20 +1,27 @@
 ﻿using Assets.Scripts.GameManagement;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
-public class Corridor : IGridItem
+public class Corridor : GridItem, IGridItem
 {
 	public Guid Id { get; private set; }
 	public CorridorType Type { get; private set; }
-	public Vector3 WorldPosition { get; private set; }
-	public List<GridPosition> GridPositions { get; private set; }
 
-	public Corridor(CorridorType type, List<GridPosition> gridPositions, Vector3 worldPosition)
+	public Corridor(CorridorType type, List<GridPosition> gridPositions)
 	{
 		this.Id = Guid.NewGuid();
 		this.Type = type;
-		this.WorldPosition = worldPosition;
 		this.GridPositions = gridPositions;
+	}
+
+	public GridPosition GetExitGridPosition(Direction direction)
+	{
+		GridPosition gridPosition = GridPositions.First();
+
+		if (gridPosition != null)
+			return new GridPosition(gridPosition.X, gridPosition.Y - 1);
+
+		return new GridPosition(0, 0);
 	}
 }

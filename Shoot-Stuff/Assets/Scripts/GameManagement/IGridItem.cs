@@ -7,7 +7,7 @@ namespace Assets.Scripts.GameManagement
 	public interface IGridItem
 	{
 		Guid Id { get; }
-		Vector3 WorldPosition { get; }
+		List<Vector3> GetWorldPositions(int ratio);
 		List<GridPosition> GridPositions { get; }
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.GameManagement;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameStateManager : MonoBehaviour
@@ -13,13 +14,16 @@ public class GameStateManager : MonoBehaviour
 	public int GridWidth = 10;
 	public int GridHeight = 10;
 	public int GridRatio = 4;
+	public int MaxRoomWidth = 1;
+	public int MaxRoomHeight = 1;
+	public int MaxBranchDepth = 5;
 
 	void Start()
 	{
 		Debug.Log("GameStateManager Starting...");
 
 		if (generator == null)
-			generator = new DungeonGenerator(GridRatio, GridWidth, GridHeight);
+			generator = new DungeonGenerator(GridRatio, GridWidth, GridHeight, MaxRoomWidth, MaxRoomHeight, MaxBranchDepth);
 
 		Dungeon dungeon = generator.GenerateDungeon();
 
@@ -31,8 +35,9 @@ public class GameStateManager : MonoBehaviour
 	{
 		if (Player != null)
 		{
-			Debug.Log($"Placing player at {spawn.WorldPosition}...");
-			Player.transform.position = new Vector3(spawn.WorldPosition.x, 1.5f, spawn.WorldPosition.z);
+			var worldPos = spawn.GetWorldPositions(GridRatio).First();
+			Debug.Log($"Placing player at {worldPos}...");
+			Player.transform.position = new Vector3(worldPos.x, 1.5f, worldPos.z);
 		}
 	}
 
@@ -41,13 +46,14 @@ public class GameStateManager : MonoBehaviour
 		foreach (KeyValuePair<Guid, Room> kvp in dungeon.Rooms)
 		{
 			Debug.Log($"Drawing room {kvp.Value.Id}...");
-			Instantiate(RoomGameObject, kvp.Value.WorldPosition, Quaternion.identity);
+			foreach(var worldPos in kvp.Value.GetWorldPositions(GridRatio))
+				Instantiate(RoomGameObject, worldPos, Quaternion.identity);
 		}
 
 		foreach (KeyValuePair<Guid, Corridor> kvp in dungeon.Corridors)
 		{
-			GameObject go = GetCorridorGameObject(kvp.Value.Type);
-			Instantiate(go, kvp.Value.WorldPosition, Quaternion.identity);
+			foreach(var worldPos in kvp.Value.GetWorldPositions(GridRatio))
+				Instantiate(TopLeft, worldPos, Quaternion.identity);
 		}
 	}
 
