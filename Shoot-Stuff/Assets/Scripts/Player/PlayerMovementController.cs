@@ -6,57 +6,73 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
 
-    [SerializeField]
-    private float speed;
-    [SerializeField]
-    private float jumpForce;
-    [SerializeField]
-    private float raycastDistance;
+	[SerializeField]
+	private float speed;
+	[SerializeField]
+	private float jumpForce;
+	[SerializeField]
+	private float raycastDistance;
 
-    private Rigidbody rb;
+	private Rigidbody rb;
+	private bool chatting = false;
 
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-    }
+	void Start()
+	{
+		rb = GetComponent<Rigidbody>();
+		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
 
-    void Update()
-    {
-        Jump();
-    }
+	}
 
-    private void FixedUpdate()
-    {
-        Move();
-    }
+	private void PlayerCameraController_Chatting(bool isChatting)
+	{
+		chatting = isChatting;
+	}
 
-    private void Move()
-    {
-        float hAxis = Input.GetAxisRaw("Horizontal");
-        float vAxis = Input.GetAxisRaw("Vertical");
+	void Update()
+	{
+		if (!chatting)
+		{
+			Jump();
+		}
+	}
 
-        Vector3 movement = new Vector3(hAxis, 0, vAxis) * speed * Time.fixedDeltaTime;
+	private void FixedUpdate()
+	{
+		if (!chatting)
+		{
+			Move();
+		}
+	}
 
-        // This will make the character move in the movement direction relative to the direction
-        // the character is facing
-        Vector3 newPosition = rb.position + rb.transform.TransformDirection(movement);
+	private void Move()
+	{
+		float hAxis = Input.GetAxisRaw("Horizontal");
+		float vAxis = Input.GetAxisRaw("Vertical");
 
-        rb.MovePosition(newPosition);
-    }
+		Vector3 movement = new Vector3(hAxis, 0, vAxis) * speed * Time.fixedDeltaTime;
 
-    private void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            if (IsGrounded()) {
-                rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
-            }
-        }
-    }
+		// This will make the character move in the movement direction relative to the direction
+		// the character is facing
+		Vector3 newPosition = rb.position + rb.transform.TransformDirection(movement);
 
-    private bool IsGrounded()
-    {
-        Debug.DrawRay(transform.position, Vector3.down * raycastDistance, Color.blue);
-        return Physics.Raycast(transform.position, Vector3.down, raycastDistance);
-    }
+		rb.MovePosition(newPosition);
+	}
+
+	private void Jump()
+	{
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			if (IsGrounded())
+			{
+				rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+			}
+		}
+	}
+
+	private bool IsGrounded()
+	{
+		Debug.DrawRay(transform.position, Vector3.down * raycastDistance, Color.blue);
+		return Physics.Raycast(transform.position, Vector3.down, raycastDistance);
+	}
 }

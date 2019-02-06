@@ -148,8 +148,8 @@ public class DungeonGenerator
 
 	private bool CheckNewGridPositionIsValid(GridPosition gridPosition)
 	{
-		return ((gridPosition.X < -gridX) || (gridPosition.X > gridX) ||
-			(gridPosition.Y < -gridY) || (gridPosition.Y > gridY) ||
+		return ((gridPosition.X > -gridX) || (gridPosition.X < gridX) ||
+			(gridPosition.Y > -gridY) || (gridPosition.Y < gridY) ||
 			(this.roomsArray[gridPosition.X, gridPosition.Y] != null));
 	}
 

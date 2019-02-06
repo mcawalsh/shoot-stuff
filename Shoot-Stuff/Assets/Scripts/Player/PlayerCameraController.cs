@@ -5,55 +5,80 @@ using UnityEngine;
 
 public class PlayerCameraController : MonoBehaviour
 {
-    [SerializeField]
-    private float lookSensitivity;
-    [SerializeField]
-    private float smoothing;
+	[SerializeField]
+	private float lookSensitivity;
+	[SerializeField]
+	private float smoothing;
 
-    private GameObject player;
-    private Vector2 smoothedVelocity;
-    private Vector2 currentLookingPos;
+	private GameObject player;
+	private Vector2 smoothedVelocity;
+	private Vector2 currentLookingPos;
+	private DialogueManager dialogueManager;
+	private bool chatting = false;
 
-    void Start()
-    {
-        player = transform.parent.gameObject;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
+	void Start()
+	{
+		player = transform.parent.gameObject;
+		Cursor.lockState = CursorLockMode.Locked;
+		Cursor.visible = false;
 
-    void Update()
-    {
-        RotateCamera();
-        //CheckForShooting();
-    }
+		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
 
-    private void CheckForShooting()
-    {
-        if (Input.GetMouseButtonDown(0)) {
-            
-            RaycastHit whatIhit;
-            if (Physics.Raycast(transform.position, transform.forward, out whatIhit, Mathf.Infinity)) {
-                Debug.Log(whatIhit.collider.name);
-            }
-        }
-    }
+	}
 
-    private void RotateCamera()
-    {
-        var x = Input.GetAxisRaw("Mouse X");
-        var y = Input.GetAxisRaw("Mouse Y");
+	private void PlayerCameraController_Chatting(bool isChatting)
+	{
+		chatting = isChatting;
 
-        Vector2 inputValues = new Vector2(x, y);
+		if (chatting)
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		} else
+		{
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
+		}
+	}
 
-        // To have different vertical and horizontal smoothing then these values would be different in the next line
-        inputValues = Vector2.Scale(inputValues, new Vector2(lookSensitivity * smoothing, lookSensitivity * smoothing));
+	void Update()
+	{
+		if (!chatting)
+		{
+			RotateCamera();
+		}
+		//CheckForShooting();
+	}
 
-        smoothedVelocity.x = Mathf.Lerp(smoothedVelocity.x, inputValues.x, 1f / smoothing);
-        smoothedVelocity.y = Mathf.Lerp(smoothedVelocity.y, inputValues.y, 1f / smoothing);
+	private void CheckForShooting()
+	{
+		if (Input.GetMouseButtonDown(0))
+		{
 
-        currentLookingPos += smoothedVelocity;
+			RaycastHit whatIhit;
+			if (Physics.Raycast(transform.position, transform.forward, out whatIhit, Mathf.Infinity))
+			{
+				Debug.Log(whatIhit.collider.name);
+			}
+		}
+	}
 
-        transform.localRotation = Quaternion.AngleAxis(-currentLookingPos.y, Vector3.right);
-        player.transform.localRotation = Quaternion.AngleAxis(currentLookingPos.x, player.transform.up);
-    }
+	private void RotateCamera()
+	{
+		var x = Input.GetAxisRaw("Mouse X");
+		var y = Input.GetAxisRaw("Mouse Y");
+
+		Vector2 inputValues = new Vector2(x, y);
+
+		// To have different vertical and horizontal smoothing then these values would be different in the next line
+		inputValues = Vector2.Scale(inputValues, new Vector2(lookSensitivity * smoothing, lookSensitivity * smoothing));
+
+		smoothedVelocity.x = Mathf.Lerp(smoothedVelocity.x, inputValues.x, 1f / smoothing);
+		smoothedVelocity.y = Mathf.Lerp(smoothedVelocity.y, inputValues.y, 1f / smoothing);
+
+		currentLookingPos += smoothedVelocity;
+
+		transform.localRotation = Quaternion.AngleAxis(-currentLookingPos.y, Vector3.right);
+		player.transform.localRotation = Quaternion.AngleAxis(currentLookingPos.x, player.transform.up);
+	}
 }

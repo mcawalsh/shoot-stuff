@@ -17,27 +17,49 @@ public class GunController : MonoBehaviour
 	public Camera fpsCam;
 	public ParticleSystem muzzleFlash;
 	public GameObject impactEffect;
+	private bool chatting = false;
 
 	void Start()
 	{
 		SetFireRateText();
+		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
+
+	}
+
+	private void PlayerCameraController_Chatting(bool isChatting)
+	{
+		chatting = isChatting;
+
+		if (chatting)
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		}
+		else
+		{
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
+		}
 	}
 
     void Update()
     {
-		if (Input.GetKeyDown(KeyCode.E))
+		if (!chatting)
 		{
-			fullAuto = !fullAuto;
-			SetFireRateText();
-		}
+			if (Input.GetKeyDown(KeyCode.E))
+			{
+				fullAuto = !fullAuto;
+				SetFireRateText();
+			}
 
-		bool shouldFire = Input.GetButtonDown(FIRE_BUTTON) || (fullAuto && Input.GetButton(FIRE_BUTTON));
+			bool shouldFire = Input.GetButtonDown(FIRE_BUTTON) || (fullAuto && Input.GetButton(FIRE_BUTTON));
 
-		if (shouldFire && Time.time >= nextTimeToFire)
-		{
-			nextTimeToFire = Time.time + 1f / fireRate;
+			if (shouldFire && Time.time >= nextTimeToFire)
+			{
+				nextTimeToFire = Time.time + 1f / fireRate;
 
-			Shoot();
+				Shoot();
+			}
 		}
     }
 
@@ -54,21 +76,28 @@ public class GunController : MonoBehaviour
 		RaycastHit hit;
 		if (Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
 		{
-			Debug.Log(hit.collider.name);
+			DialogueTrigger trigger = hit.transform.GetComponent<DialogueTrigger>();
 
-			IDamageable damageable = hit.transform.GetComponent<IDamageable>();
-			Debug.Log($"{hit.collider.name} at position: {hit.collider.transform.position}");
-
-			if (damageable != null)
+			if (trigger != null)
 			{
-				Debug.Log($"Dealing {damage} damage to {hit.collider.name}");
-				damageable.TakeDamage(damage);
+				trigger.TriggerDialogue();
 			}
 
-			if (hit.rigidbody != null)
-			{
-				hit.rigidbody.AddForce(-hit.normal * impactForce);
-			}
+			//Debug.Log(hit.collider.name);
+
+			//IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+			//Debug.Log($"{hit.collider.name} at position: {hit.collider.transform.position}");
+
+			//if (damageable != null)
+			//{
+			//	Debug.Log($"Dealing {damage} damage to {hit.collider.name}");
+			//	damageable.TakeDamage(damage);
+			//}
+
+			//if (hit.rigidbody != null)
+			//{
+			//	hit.rigidbody.AddForce(-hit.normal * impactForce);
+			//}
 
 			GameObject explosion = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
 			Destroy(explosion, 2f);
