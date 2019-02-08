@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovementController : MonoBehaviour
@@ -14,24 +12,36 @@ public class PlayerMovementController : MonoBehaviour
 	private float raycastDistance;
 
 	private Rigidbody rb;
-	private bool chatting = false;
+	private bool canMove = true;
 
 
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
-		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
 
+		SubscribeToEvents();
+	}
+
+	private void SubscribeToEvents()
+	{
+		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
+		FindObjectOfType<BuildManager>().OnBuilding += OnBuilding;
+	}
+
+	private void OnBuilding(bool isBuilding)
+	{
+		Debug.Log($"OnBuilding in PlayerMovement with value {isBuilding}");
+		canMove = !isBuilding;
 	}
 
 	private void PlayerCameraController_Chatting(bool isChatting)
 	{
-		chatting = isChatting;
+		canMove = !isChatting;
 	}
 
 	void Update()
 	{
-		if (!chatting)
+		if (canMove)
 		{
 			Jump();
 		}
@@ -39,7 +49,7 @@ public class PlayerMovementController : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		if (!chatting)
+		if (canMove)
 		{
 			Move();
 		}

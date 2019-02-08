@@ -14,7 +14,7 @@ public class PlayerCameraController : MonoBehaviour
 	private Vector2 smoothedVelocity;
 	private Vector2 currentLookingPos;
 	private DialogueManager dialogueManager;
-	private bool chatting = false;
+	private bool canMove = true;
 
 	void Start()
 	{
@@ -22,32 +22,48 @@ public class PlayerCameraController : MonoBehaviour
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
-		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
+		SubscribeToEvents();
 
+	}
+
+	private void SubscribeToEvents()
+	{
+		FindObjectOfType<BuildManager>().OnBuilding += OnBuild;
+		FindObjectOfType<DialogueManager>().Chatting += PlayerCameraController_Chatting;
+	}
+
+	private void OnBuild(bool isBuilding)
+	{
+		Debug.Log($"OnBuilding in PlayerCamera with value {isBuilding}");
+		canMove = !isBuilding;
+		LockControls(canMove);
 	}
 
 	private void PlayerCameraController_Chatting(bool isChatting)
 	{
-		chatting = isChatting;
+		canMove = !isChatting;
+		LockControls(canMove);
+	}
 
-		if (chatting)
-		{
-			Cursor.lockState = CursorLockMode.None;
-			Cursor.visible = true;
-		} else
+	private void LockControls(bool shouldLock)
+	{
+		if (shouldLock)
 		{
 			Cursor.lockState = CursorLockMode.Locked;
 			Cursor.visible = false;
+		} else
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
 		}
 	}
 
 	void Update()
 	{
-		if (!chatting)
+		if (canMove)
 		{
 			RotateCamera();
 		}
-		//CheckForShooting();
 	}
 
 	private void CheckForShooting()

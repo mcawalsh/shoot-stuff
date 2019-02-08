@@ -24,6 +24,11 @@ public class DialogueManager : MonoBehaviour
 		sentences = new Queue<string>();
     }
 
+	public void TriggerChat(bool isChatting)
+	{
+		this.Chatting(isChatting);
+	}
+
 	public void StartDialogue(Dialogue dialogue)
 	{
 		this.Chatting(true);
@@ -78,6 +83,6 @@ public class DialogueManager : MonoBehaviour
 	private void EndDialogue()
 	{
 		animator.SetBool("IsOpen", false);
-		this.Chatting(false);
+		Chatting(false);
 	}
 }
